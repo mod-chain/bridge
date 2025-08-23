@@ -1,0 +1,43 @@
+# Node
+node_modules/
+**/node_modules/
+.pnpm-store/
+
+# Builds / Artifacts
+**/dist/
+**/build/
+**/out/
+**/artifacts/
+
+# TypeScript
+**/*.tsbuildinfo
+
+# Env / Secrets
+.env
+.env.*
+!.env.sample
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs/
+*.log
+
+# Foundry
+cache/
+out/
+**/cache/
+**/out/
+# Hardhat
+**/cache/
+**/artifacts/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

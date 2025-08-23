@@ -1,0 +1,22 @@
+{
+  "name": "bridge-hardhat",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "deploy:l2": "ts-node scripts/deployL2Token.ts",
+    "deposit": "ts-node scripts/deposit.ts",
+    "verify:addresses": "ts-node scripts/verifyAddresses.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "format": "prettier -w .",
+    "format:check": "prettier -c ."
+  },
+  "dependencies": {
+    "ethers": "^6.13.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.4",
+    "prettier": "^3.3.3"
+  }
+}

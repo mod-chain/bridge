@@ -1,0 +1,34 @@
+{
+  "ethereum": {
+    "rpc": "${ETHEREUM_RPC}",
+    "L1StandardBridge": "0x3154Cf16ccdb4C6d922629664174b904d80F2C35",
+    "L1CrossDomainMessenger": "0x866E82a600A1414e583f7F13623F1aC5d58b0Afa",
+    "OptimismMintableERC20Factory": "0x05cc379EBD9B30BbA19C6fA282AB29218EC61D84",
+    "L1Token": "0xYOUR_L1_TOKEN"
+  },
+  "sepolia": {
+    "rpc": "${ETHEREUM_SEPOLIA_RPC}",
+    "L1StandardBridge": "0xfd0Bf71F60660E2f608ed56e1659C450eB113120",
+    "L1CrossDomainMessenger": "0xC34855F4De64F1840e5686e64278da901e261f20",
+    "OptimismMintableERC20Factory": "0xb1efB9650aD6d0CC1ed3Ac4a0B7f1D5732696D37",
+    "L1Token": "0xYOUR_L1_TOKEN_ON_SEPOLIA"
+  },
+  "base": {
+    "rpc": "${BASE_RPC}",
+    "L2StandardBridge": "0x4200000000000000000000000000000000000010",
+    "L2CrossDomainMessenger": "0x4200000000000000000000000000000000000007",
+    "OptimismMintableERC20Factory": "0xF10122D428B4bc8A9d050D06a2037259b4c4B83B",
+    "L2Token": "0xTO_BE_FILLED_AFTER_DEPLOY"
+  },
+  "base_sepolia": {
+    "rpc": "${BASE_SEPOLIA_RPC}",
+    "L2StandardBridge": "0x4200000000000000000000000000000000000010",
+    "L2CrossDomainMessenger": "0x4200000000000000000000000000000000000007",
+    "OptimismMintableERC20Factory": "0x4200000000000000000000000000000000000012",
+    "L2Token": "0xTO_BE_FILLED_AFTER_DEPLOY"
+  },
+  "snowbridge": {
+    "sepolia_gateway": "0x5b4909ce6ca82d2ce23bd46738953c7959e710cd",
+    "mainnet_gateway": "0x27ca963c279c93801941e1eb8799c23f407d68e7"
+  }
+}

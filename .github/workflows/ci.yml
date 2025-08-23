@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [ develop, staging, production ]
+  pull_request:
+    branches: [ develop, staging, production ]
+
+jobs:
+  lint-and-typecheck:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Enable corepack (pnpm)
+        run: corepack enable
+
+      - name: Show pnpm version
+        run: pnpm -v || true
+
+      - name: Install deps (hardhat)
+        working-directory: packages/hardhat
+        run: pnpm i --frozen-lockfile=false
+
+      - name: Typecheck (hardhat)
+        working-directory: packages/hardhat
+        run: pnpm run typecheck
+
+      - name: Prettier check (hardhat)
+        working-directory: packages/hardhat
+        run: pnpm run format:check
+
+      - name: Install deps (snowbridge)
+        working-directory: packages/snowbridge
+        run: pnpm i --frozen-lockfile=false
+
+      - name: Typecheck (snowbridge)
+        working-directory: packages/snowbridge
+        run: pnpm run typecheck
+
+      - name: Prettier check (snowbridge)
+        working-directory: packages/snowbridge
+        run: pnpm run format:check

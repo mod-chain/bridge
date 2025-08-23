@@ -1,0 +1,21 @@
+{
+  "name": "snowbridge-scripts",
+  "version": "0.1.0",
+  "type": "module",
+  "dependencies": {
+    "ethers": "^6.13.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4"
+  },
+  "scripts": {
+    "register": "ts-node scripts/registerToken.ts",
+    "send": "ts-node scripts/sendToken.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "format": "prettier -w .",
+    "format:check": "prettier -c ."
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.4",
+    "prettier": "^3.3.3"
+  }
+}
