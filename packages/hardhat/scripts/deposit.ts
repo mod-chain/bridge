@@ -10,9 +10,7 @@ const L1_TOKEN = cfg.ethereum?.L1Token || cfg.sepolia.L1Token;
 const L2_TOKEN = cfg.base?.L2Token || cfg.base_sepolia.L2Token;
 
 const erc20Abi = ["function approve(address,uint256) returns (bool)"];
-const bridgeAbi = [
-  "function depositERC20(address,address,uint256,uint32,bytes) payable"
-];
+const bridgeAbi = ["function depositERC20(address,address,uint256,uint32,bytes) payable"];
 
 async function main() {
   const provider = new ethers.JsonRpcProvider(RPC);
@@ -24,7 +22,8 @@ async function main() {
   if (!RPC) throw new Error("ETHEREUM_RPC or ETHEREUM_SEPOLIA_RPC must be set");
   if (!PK) throw new Error("DEPLOYER_PK must be set");
 
-  if (!L1_STANDARD_BRIDGE || !L1_TOKEN || !L2_TOKEN) throw new Error("Bridge or token addresses missing in ops/addresses.json");
+  if (!L1_STANDARD_BRIDGE || !L1_TOKEN || !L2_TOKEN)
+    throw new Error("Bridge or token addresses missing in ops/addresses.json");
   if (String(L1_TOKEN).startsWith("0xYOUR") || String(L2_TOKEN).startsWith("0xTO_BE")) {
     throw new Error("Please fill L1Token and L2Token in ops/addresses.json");
   }

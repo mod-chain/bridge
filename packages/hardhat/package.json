@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.7.4",
+    "hardhat": "^3.0.1",
     "prettier": "^3.3.3"
   }
 }

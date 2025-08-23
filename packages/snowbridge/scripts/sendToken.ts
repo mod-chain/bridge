@@ -7,7 +7,9 @@ const RPC = process.env.ETHEREUM_RPC || process.env.ETHEREUM_SEPOLIA_RPC!;
 const isMainnet = Boolean(process.env.ETHEREUM_RPC);
 
 const PK = process.env.OPERATOR_PK!;
-const GATEWAY = process.env.SNOWBRIDGE_GATEWAY || (isMainnet ? cfg.snowbridge.mainnet_gateway : cfg.snowbridge.sepolia_gateway);
+const GATEWAY =
+  process.env.SNOWBRIDGE_GATEWAY ||
+  (isMainnet ? cfg.snowbridge.mainnet_gateway : cfg.snowbridge.sepolia_gateway);
 const TOKEN = process.env.L1_TOKEN || (isMainnet ? cfg.ethereum?.L1Token : cfg.sepolia?.L1Token);
 
 // destinationChain is the parachain id. Example: 1000 for Asset Hub on some testnets. Parameterize it.
@@ -20,7 +22,7 @@ const AMOUNT = BigInt(process.env.AMOUNT || "0");
 
 const abi = [
   "function quoteSendTokenFee(address token, uint32 destinationChain, (uint8 kind, bytes data) destinationAddress, uint128 destinationFee, uint128 amount) view returns (uint256)",
-  "function sendToken(address token, uint32 destinationChain, (uint8 kind, bytes data) destinationAddress, uint128 destinationFee, uint128 amount) payable"
+  "function sendToken(address token, uint32 destinationChain, (uint8 kind, bytes data) destinationAddress, uint128 destinationFee, uint128 amount) payable",
 ];
 
 async function main() {
@@ -31,7 +33,8 @@ async function main() {
   if (!RPC) throw new Error("ETHEREUM_RPC or ETHEREUM_SEPOLIA_RPC must be set");
   if (!PK) throw new Error("OPERATOR_PK must be set");
   if (!GATEWAY || !TOKEN) throw new Error("GATEWAY or TOKEN not configured");
-  if (String(TOKEN).startsWith("0xYOUR")) throw new Error("Please fill L1Token in ops/addresses.json or set L1_TOKEN env");
+  if (String(TOKEN).startsWith("0xYOUR"))
+    throw new Error("Please fill L1Token in ops/addresses.json or set L1_TOKEN env");
   if (!DEST_BYTES) throw new Error("DEST_BYTES must be set (hex-encoded destination AccountId)");
   if (AMOUNT <= 0n) throw new Error("AMOUNT must be > 0");
 

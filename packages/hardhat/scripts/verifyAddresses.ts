@@ -6,16 +6,35 @@ const cfg = JSON.parse(fs.readFileSync("../../ops/addresses.json", "utf8"));
 
 const providers: Record<string, ethers.JsonRpcProvider | null> = {
   ethereum: process.env.ETHEREUM_RPC ? new ethers.JsonRpcProvider(process.env.ETHEREUM_RPC) : null,
-  sepolia: process.env.ETHEREUM_SEPOLIA_RPC ? new ethers.JsonRpcProvider(process.env.ETHEREUM_SEPOLIA_RPC) : null,
+  sepolia: process.env.ETHEREUM_SEPOLIA_RPC
+    ? new ethers.JsonRpcProvider(process.env.ETHEREUM_SEPOLIA_RPC)
+    : null,
   base: process.env.BASE_RPC ? new ethers.JsonRpcProvider(process.env.BASE_RPC) : null,
-  base_sepolia: process.env.BASE_SEPOLIA_RPC ? new ethers.JsonRpcProvider(process.env.BASE_SEPOLIA_RPC) : null,
+  base_sepolia: process.env.BASE_SEPOLIA_RPC
+    ? new ethers.JsonRpcProvider(process.env.BASE_SEPOLIA_RPC)
+    : null,
 };
 
 const ADDRESS_FIELDS: Record<string, string[]> = {
-  ethereum: ["L1StandardBridge", "L1CrossDomainMessenger", "OptimismMintableERC20Factory", "L1Token"],
-  sepolia: ["L1StandardBridge", "L1CrossDomainMessenger", "OptimismMintableERC20Factory", "L1Token"],
+  ethereum: [
+    "L1StandardBridge",
+    "L1CrossDomainMessenger",
+    "OptimismMintableERC20Factory",
+    "L1Token",
+  ],
+  sepolia: [
+    "L1StandardBridge",
+    "L1CrossDomainMessenger",
+    "OptimismMintableERC20Factory",
+    "L1Token",
+  ],
   base: ["L2StandardBridge", "L2CrossDomainMessenger", "OptimismMintableERC20Factory", "L2Token"],
-  base_sepolia: ["L2StandardBridge", "L2CrossDomainMessenger", "OptimismMintableERC20Factory", "L2Token"],
+  base_sepolia: [
+    "L2StandardBridge",
+    "L2CrossDomainMessenger",
+    "OptimismMintableERC20Factory",
+    "L2Token",
+  ],
 };
 
 function isPlaceholder(addr: string): boolean {
