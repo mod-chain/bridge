@@ -61,9 +61,6 @@ sudo chmod -R 777 "$BASE_DIR" || true
 # Common setup-permissions script content
 PERM_FIX_SCRIPT='#!/bin/bash
 set -e
-if getent group docker > /dev/null; then
-  usermod -aG docker runner || true
-fi
 if [ -e /var/run/docker.sock ]; then
   chmod 666 /var/run/docker.sock || true
 fi
