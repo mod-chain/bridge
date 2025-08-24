@@ -14,15 +14,37 @@ log_error() { echo -e "${RED}[ERROR]${NC} $1"; exit 1; }
 log_info "Checking required tools..."
 command -v docker >/dev/null || log_error "docker is required but not installed."
 
-# Inputs
-read -p "Enter GitHub Personal Access Token (repo scope): " GITHUB_PAT
-read -p "Enter repositories (comma-separated owner/repo, e.g. mod-net/chain,mod-net/bridge): " REPO_LIST
+# Config via file or prompts
+CONFIG_FILE=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -c|--config)
+      CONFIG_FILE="$2"; shift 2 ;;
+    *) shift ;;
+  esac
+done
+
+# Defaults
+: "${LABELS:=self-hosted,linux,x64,modnet-runner}"
+: "${BASE_DIR:=/home/github-runner/actions-runner}"
+: "${IMAGE:=tcardonne/github-runner:latest}"
+
+if [ -n "$CONFIG_FILE" ] && [ -f "$CONFIG_FILE" ]; then
+  log_info "Loading config from $CONFIG_FILE"
+  # shellcheck disable=SC1090
+  . "$CONFIG_FILE"
+fi
+
+# If not provided via config/env, prompt
+if [ -z "$GITHUB_PAT" ]; then
+  read -p "Enter GitHub Personal Access Token (repo scope): " GITHUB_PAT
+fi
+if [ -z "$REPOS" ]; then
+  read -p "Enter repositories (comma-separated owner/repo, e.g. mod-net/chain,mod-net/bridge): " REPOS
+fi
 
 [ -z "$GITHUB_PAT" ] && log_error "GitHub PAT is required"
-[ -z "$REPO_LIST" ] && log_error "At least one repository is required"
-
-RUNNER_LABELS="self-hosted,linux,x64,modnet-runner"
-BASE_DIR="/home/github-runner/actions-runner"
+[ -z "$REPOS" ] && log_error "At least one repository is required"
 
 mkdir -p "$BASE_DIR"
 sudo chmod -R 777 "$BASE_DIR" || true
@@ -50,7 +72,7 @@ chmod +x /__e/node20/bin/node'
 
 # Normalize list into array
 REPO_ARRAY=()
-IFS=',' read -ra TMP <<< "$REPO_LIST"
+IFS=',' read -ra TMP <<< "$REPOS"
 for item in "${TMP[@]}"; do
   # trim spaces
   repo=$(echo "$item" | xargs)
@@ -94,7 +116,7 @@ for OWNER_REPO in "${REPO_ARRAY[@]}"; do
     -e RUNNER_TOKEN_REPO="${REPO_URL}" \
     -e DISABLE_RUNNER_UPDATE=true \
     -e RUNNER_ALLOW_RUNASROOT=true \
-    tcardonne/github-runner:latest
+    "$IMAGE"
 
   log_info "Applying permissions inside ${CONTAINER_NAME}"
   docker exec "${CONTAINER_NAME}" bash -c "/home/runner/setup-permissions.sh" || true
