@@ -33,6 +33,15 @@ if [ -n "$CONFIG_FILE" ] && [ -f "$CONFIG_FILE" ]; then
   log_info "Loading config from $CONFIG_FILE"
   # shellcheck disable=SC1090
   . "$CONFIG_FILE"
+else
+  # Auto-load config from the script directory if present
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  DEFAULT_CONF="$SCRIPT_DIR/runner.conf"
+  if [ -f "$DEFAULT_CONF" ]; then
+    log_info "Loading config from $DEFAULT_CONF"
+    # shellcheck disable=SC1090
+    . "$DEFAULT_CONF"
+  fi
 fi
 
 # If not provided via config/env, prompt
@@ -63,7 +72,7 @@ chmod 777 /__w/_temp /__w/_actions /__w/_tool /__w/_work 2>/dev/null || true
 mkdir -p /home/runner/_work 2>/dev/null || true
 chmod 777 /home/runner/_work 2>/dev/null || true
 mkdir -p /__e/node20/bin
-cat > /__e/node20/bin/node << \"NODESCRIPT\"
+cat > /__e/node20/bin/node << '\''NODESCRIPT'\''
 #!/bin/sh
 echo "Dummy node script executed"
 exit 0
