@@ -1,7 +1,6 @@
 {
   "name": "bridge-hardhat",
   "version": "0.1.0",
-  "type": "module",
   "scripts": {
     "deploy:l2": "ts-node scripts/deployL2Token.ts",
     "deposit": "ts-node scripts/deposit.ts",
