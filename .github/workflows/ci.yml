@@ -12,6 +12,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          clean: true
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -19,31 +22,56 @@ jobs:
           node-version: 20
 
       - name: Enable corepack (pnpm)
-        run: corepack enable
+        run: |
+          corepack enable
+          corepack prepare pnpm@9.6.0 --activate
+          pnpm -v
 
       - name: Show pnpm version
         run: pnpm -v || true
 
+      - name: Debug workspace
+        run: |
+          echo "GITHUB_WORKSPACE=${GITHUB_WORKSPACE}"
+          pwd
+          ls -la
+          ls -la packages || true
+          ls -la packages/hardhat || true
+
       - name: Install deps (hardhat)
-        working-directory: packages/hardhat
+        working-directory: ${{ github.workspace }}/packages/hardhat
         run: pnpm i --frozen-lockfile=false
 
+      - name: Debug before typecheck (hardhat)
+        working-directory: ${{ github.workspace }}/packages/hardhat
+        run: |
+          pwd
+          ls -la
+          cat tsconfig.json || true
+
       - name: Typecheck (hardhat)
-        working-directory: packages/hardhat
+        working-directory: ${{ github.workspace }}/packages/hardhat
         run: pnpm run typecheck
 
       - name: Prettier check (hardhat)
-        working-directory: packages/hardhat
+        working-directory: ${{ github.workspace }}/packages/hardhat
         run: pnpm run format:check
 
       - name: Install deps (snowbridge)
-        working-directory: packages/snowbridge
+        working-directory: ${{ github.workspace }}/packages/snowbridge
         run: pnpm i --frozen-lockfile=false
 
+      - name: Debug before typecheck (snowbridge)
+        working-directory: ${{ github.workspace }}/packages/snowbridge
+        run: |
+          pwd
+          ls -la
+          cat tsconfig.json || true
+
       - name: Typecheck (snowbridge)
-        working-directory: packages/snowbridge
+        working-directory: ${{ github.workspace }}/packages/snowbridge
         run: pnpm run typecheck
 
       - name: Prettier check (snowbridge)
-        working-directory: packages/snowbridge
+        working-directory: ${{ github.workspace }}/packages/snowbridge
         run: pnpm run format:check

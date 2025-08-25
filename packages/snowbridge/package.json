@@ -10,7 +10,7 @@
   "scripts": {
     "register": "ts-node scripts/registerToken.ts",
     "send": "ts-node scripts/sendToken.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p ./tsconfig.json --noEmit",
     "format": "prettier -w .",
     "format:check": "prettier -c ."
   },
