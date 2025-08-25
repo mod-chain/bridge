@@ -11,9 +11,7 @@ const erc20Abi = [
   "function totalSupply() view returns (uint256)",
   "function decimals() view returns (uint8)",
 ];
-const optimismMintableAbi = [
-  "function remoteToken() view returns (address)",
-];
+const optimismMintableAbi = ["function remoteToken() view returns (address)"];
 
 function loadConfig() {
   const raw = fs.readFileSync(ADDR_PATH, "utf8");
@@ -48,21 +46,27 @@ async function main() {
   });
 
   const network = (argv.network || "sepolia").toLowerCase();
-  if (!["mainnet", "sepolia"].includes(network)) throw new Error("--network must be mainnet or sepolia");
+  if (!["mainnet", "sepolia"].includes(network))
+    throw new Error("--network must be mainnet or sepolia");
   const cfg = loadConfig();
   const l1Key = network === "mainnet" ? "ethereum" : "sepolia";
   const l2Key = network === "mainnet" ? "base" : "base_sepolia";
 
-  const l1Rpc = argv["l1-rpc"] || (network === "mainnet" ? process.env.ETHEREUM_RPC : process.env.ETHEREUM_SEPOLIA_RPC);
-  const l2Rpc = argv["l2-rpc"] || (network === "mainnet" ? process.env.BASE_RPC : process.env.BASE_SEPOLIA_RPC);
+  const l1Rpc =
+    argv["l1-rpc"] ||
+    (network === "mainnet" ? process.env.ETHEREUM_RPC : process.env.ETHEREUM_SEPOLIA_RPC);
+  const l2Rpc =
+    argv["l2-rpc"] || (network === "mainnet" ? process.env.BASE_RPC : process.env.BASE_SEPOLIA_RPC);
   if (!l1Rpc || !l2Rpc) throw new Error("Missing RPCs; pass --l1-rpc/--l2-rpc or set env vars");
 
   const l1Token = (argv["l1-token"] || cfg[l1Key]?.L1Token || "").toString();
   const l2Token = (argv["l2-token"] || cfg[l2Key]?.L2Token || "").toString();
   const l1Bridge = cfg[l1Key]?.L1StandardBridge;
 
-  if (!l1Token || !l2Token || !l1Bridge) throw new Error("Missing L1/L2 token or L1 bridge in ops/addresses.json");
-  if (l1Token.startsWith("0xYOUR") || l2Token.startsWith("0xTO_BE")) throw new Error("Fill L1Token/L2Token in ops/addresses.json");
+  if (!l1Token || !l2Token || !l1Bridge)
+    throw new Error("Missing L1/L2 token or L1 bridge in ops/addresses.json");
+  if (l1Token.startsWith("0xYOUR") || l2Token.startsWith("0xTO_BE"))
+    throw new Error("Fill L1Token/L2Token in ops/addresses.json");
 
   const accountsCsv = (argv.accounts as string) || "";
   const accounts = toArrayCsv(accountsCsv);

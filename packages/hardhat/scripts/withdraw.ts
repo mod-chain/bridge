@@ -55,7 +55,7 @@ async function main() {
     default: {
       mode: "initiate-only",
       "poll-interval": "30",
-      "timeout": "0",
+      timeout: "0",
       "l1-gas": "200000",
       data: "0x",
     },
@@ -70,8 +70,11 @@ async function main() {
   const l1Key = network === "mainnet" ? "ethereum" : "sepolia";
   const l2Key = network === "mainnet" ? "base" : "base_sepolia";
 
-  const l2Rpc = argv["l2-rpc"] || (network === "mainnet" ? process.env.BASE_RPC : process.env.BASE_SEPOLIA_RPC);
-  const l1Rpc = argv["l1-rpc"] || (network === "mainnet" ? process.env.ETHEREUM_RPC : process.env.ETHEREUM_SEPOLIA_RPC);
+  const l2Rpc =
+    argv["l2-rpc"] || (network === "mainnet" ? process.env.BASE_RPC : process.env.BASE_SEPOLIA_RPC);
+  const l1Rpc =
+    argv["l1-rpc"] ||
+    (network === "mainnet" ? process.env.ETHEREUM_RPC : process.env.ETHEREUM_SEPOLIA_RPC);
   const pk = argv.pk || process.env.ETH_PRIVATE_KEY || process.env.DEPLOYER_PK;
 
   if (!l1Rpc || !l2Rpc) throw new Error("Missing RPCs. Use --l1-rpc/--l2-rpc or set env vars.");
@@ -83,8 +86,10 @@ async function main() {
   const l2TokenAddr = (argv["l2-token"] || defaultL2Token || "").toString();
   const l1TokenAddr = (argv["l1-token"] || defaultL1Token || "").toString();
 
-  if (!l2BridgeAddr || !l2TokenAddr || !l1TokenAddr) throw new Error("Missing L2 bridge or token addresses in ops/addresses.json");
-  if (l1TokenAddr.startsWith("0xYOUR") || l2TokenAddr.startsWith("0xTO_BE")) throw new Error("Fill L1Token/L2Token in ops/addresses.json");
+  if (!l2BridgeAddr || !l2TokenAddr || !l1TokenAddr)
+    throw new Error("Missing L2 bridge or token addresses in ops/addresses.json");
+  if (l1TokenAddr.startsWith("0xYOUR") || l2TokenAddr.startsWith("0xTO_BE"))
+    throw new Error("Fill L1Token/L2Token in ops/addresses.json");
 
   const l2TxHash = argv["l2-tx"] as string | undefined;
   const amount = l2TxHash ? 0n : BigInt(argv.amount || "0");
@@ -135,7 +140,8 @@ async function main() {
   // Parse WithdrawalInitiated event
   const topic0 = ethers.id("WithdrawalInitiated(address,address,address,address,uint256,bytes)");
   const log = receipt.logs.find(
-    (l: any) => l.address.toLowerCase() === l2BridgeAddr.toLowerCase() && l.topics && l.topics[0] === topic0
+    (l: any) =>
+      l.address.toLowerCase() === l2BridgeAddr.toLowerCase() && l.topics && l.topics[0] === topic0
   );
   if (!log) throw new Error("WithdrawalInitiated event not found in receipt");
 
@@ -143,7 +149,7 @@ async function main() {
     "event WithdrawalInitiated(address indexed l1Token,address indexed l2Token,address indexed from,address to,uint256 amount,bytes data)",
   ]);
   const parsed = iface.parseLog({ topics: log.topics, data: log.data });
-  const toAddr = (parsed?.args?.to as string) || ((argv.recipient as string) || l1Wallet.address);
+  const toAddr = (parsed?.args?.to as string) || (argv.recipient as string) || l1Wallet.address;
 
   if (initiated) {
     ensureDir(ART_WITHDRAW_DIR);
@@ -154,7 +160,7 @@ async function main() {
       log_index: (log as any).index ?? (log as any).logIndex ?? 0,
       l2_token: l2TokenAddr,
       l1_token: l1TokenAddr,
-      from: (parsed?.args?.from as string),
+      from: parsed?.args?.from as string,
       to: toAddr,
       amount: amount.toString(),
       data,
@@ -173,7 +179,9 @@ async function main() {
   console.log("Mode is initiate-and-finalize; polling until ready...");
   // Optional contracts override if provided in ops/addresses.json
   const contractsOverride =
-    cfg[l1Key]?.OptimismPortal || cfg[l1Key]?.L1CrossDomainMessenger || cfg[l2Key]?.L2CrossDomainMessenger
+    cfg[l1Key]?.OptimismPortal ||
+    cfg[l1Key]?.L1CrossDomainMessenger ||
+    cfg[l2Key]?.L2CrossDomainMessenger
       ? {
           l1: {
             l1CrossDomainMessenger: cfg[l1Key]?.L1CrossDomainMessenger,
