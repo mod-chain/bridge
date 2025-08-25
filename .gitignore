@@ -2,6 +2,7 @@ manifest.md
 manifest-2.md
 diff.md
 make-diff.sh
+scripts/CDP_API_KEY
 
 # Node
 node_modules/

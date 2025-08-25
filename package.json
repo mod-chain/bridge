@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "wallet:create": "pnpm -C packages/wallet run create",
+    "wallet:get": "pnpm -C packages/wallet run get",
+    "wallet:faucet": "pnpm -C packages/wallet run faucet"
+  },
+  "dependencies": {
+    "@coinbase/cdp-sdk": "^1.36.0",
+    "dotenv": "^17.2.1",
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}
