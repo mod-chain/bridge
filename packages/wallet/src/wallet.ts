@@ -17,7 +17,9 @@ async function cmdGet(address?: string) {
   const addr = address || process.env.CDP_WALLET_ADDRESS;
   if (!addr) throw new Error("CDP_WALLET_ADDRESS not set; pass --address <0x...> or set env var");
   const account = await cdp.evm.getAccount({ address: addr as `0x${string}` });
-  console.log(account);
+  const accountMessage = `Collected account: ${account.address}`;
+  console.log(accountMessage);
+  return account;
 }
 
 async function cmdFaucet(address?: string) {
@@ -51,6 +53,8 @@ async function main() {
       process.exitCode = 2;
   }
 }
+
+export { cmdGet };
 
 main().catch((e) => {
   console.error(e);

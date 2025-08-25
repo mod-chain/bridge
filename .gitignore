@@ -8,6 +8,7 @@ scripts/CDP_API_KEY
 node_modules/
 **/node_modules/
 .pnpm-store/
+*pnpm-lock.yaml
 
 # Builds / Artifacts
 **/dist/
