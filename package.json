@@ -1,4 +1,5 @@
 {
+  "packageManager": "pnpm@9.6.0",
   "scripts": {
     "wallet:create": "pnpm -C packages/wallet run create",
     "wallet:get": "pnpm -C packages/wallet run get",
