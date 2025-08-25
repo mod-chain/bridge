@@ -1,0 +1,23 @@
+name: branch-policy
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
+
+jobs:
+  policy:
+    name: policy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce source branch policy
+        run: |
+          echo "Base: $GITHUB_BASE_REF, Head: $GITHUB_HEAD_REF"
+          if [ "$GITHUB_BASE_REF" = "production" ] && [ "$GITHUB_HEAD_REF" != "staging" ]; then
+            echo "Only PRs from 'staging' can be merged into 'production'." >&2
+            exit 1
+          fi
+          if [ "$GITHUB_BASE_REF" = "staging" ] && [ "$GITHUB_HEAD_REF" != "develop" ]; then
+            echo "Only PRs from 'develop' can be merged into 'staging'." >&2
+            exit 1
+          fi
+          echo "Policy OK."

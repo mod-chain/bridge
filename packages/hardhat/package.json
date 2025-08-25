@@ -6,16 +6,21 @@
     "deploy:l2": "ts-node scripts/deployL2Token.ts",
     "deposit": "ts-node scripts/deposit.ts",
     "verify:addresses": "ts-node scripts/verifyAddresses.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "withdraw": "ts-node scripts/withdraw.ts",
+    "check:supply": "ts-node scripts/checkSupply.ts",
+    "typecheck": "tsc -p ./tsconfig.json --noEmit",
     "format": "prettier -w .",
     "format:check": "prettier -c ."
   },
   "dependencies": {
+    "@eth-optimism/sdk": "^3.3.3",
     "ethers": "^6.13.2",
+    "minimist": "^1.2.8",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4"
   },
   "devDependencies": {
+    "@types/minimist": "^1.2.5",
     "@types/node": "^22.7.4",
     "hardhat": "^3.0.1",
     "prettier": "^3.3.3"

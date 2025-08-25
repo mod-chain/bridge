@@ -1,3 +1,8 @@
+manifest.md
+manifest-2.md
+diff.md
+make-diff.sh
+
 # Node
 node_modules/
 **/node_modules/
