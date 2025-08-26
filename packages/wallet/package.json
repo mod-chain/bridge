@@ -1,0 +1,23 @@
+{
+  "name": "wallet",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "create": "ts-node --project ./tsconfig.json src/wallet.ts create",
+    "get": "ts-node --project ./tsconfig.json src/wallet.ts get",
+    "faucet": "ts-node --project ./tsconfig.json src/wallet.ts faucet"
+  },
+  "dependencies": {
+    "@coinbase/cdp-sdk": "^1.36.0",
+    "dotenv": "^17.2.1",
+    "minimist": "^1.2.8",
+    "ts-node": "^10.9.2",
+    "viem": "^2.35.1",
+    "types": "link:@coinbase/cdk-sdk/types"
+  },
+  "devDependencies": {
+    "@types/minimist": "^1.2.5",
+    "@types/node": "^22.7.4",
+    "typescript": "^5.5.4"
+  }
+}

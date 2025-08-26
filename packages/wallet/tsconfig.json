@@ -9,6 +9,5 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "include": ["scripts/**/*.ts"],
-  "exclude": ["hardhat.config.ts"]
+  "include": ["src/**/*.ts"]
 }
