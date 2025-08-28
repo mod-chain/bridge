@@ -22,7 +22,7 @@ async function getBaseBalances(account: EvmServerAccount, network: BaseNetworks)
     return balances;
 }
 
-async function main() {
+export async function cmdBalance() {
     const account = await cmdGet();
     const networks: Networks[] = ["base-sepolia", "base", "ethereum-sepolia", "ethereum"];
     for (const network of networks) {
@@ -35,7 +35,7 @@ async function main() {
             // Optional: fetch ERC-20s from env-delimited list
             const listEnv = network === "ethereum" ? process.env.ETHEREUM_TOKENS : process.env.ETHEREUM_SEPOLIA_TOKENS;
             if (listEnv) {
-                const tokens = listEnv.split(/[,\s]+/).filter(Boolean) as `0x${string}`[];
+                const tokens = listEnv.split(/[\,\s]+/).filter(Boolean) as `0x${string}`[];
                 for (const token of tokens) {
                     try {
                         const { formatted, symbol } = await getErc20Balance(token, account.address as `0x${string}`, network as EthNetworks);
@@ -48,9 +48,4 @@ async function main() {
         }
     }
 }
-
-main().catch((e) => {
-    console.error(e);
-    process.exit(1);
-});
     

@@ -3,9 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "create": "ts-node --project ./tsconfig.json src/wallet.ts create",
-    "get": "ts-node --project ./tsconfig.json src/wallet.ts get",
-    "faucet": "ts-node --project ./tsconfig.json src/wallet.ts faucet"
+    "help": "ts-node --project ./tsconfig.json src/cli.ts help",
+    "check-env": "ts-node --project ./tsconfig.json src/cli.ts check-env",
+    "create": "ts-node --project ./tsconfig.json src/cli.ts create",
+    "get": "ts-node --project ./tsconfig.json src/cli.ts get",
+    "faucet": "ts-node --project ./tsconfig.json src/cli.ts faucet",
+    "send": "ts-node --project ./tsconfig.json src/cli.ts send",
+    "receive": "ts-node --project ./tsconfig.json src/cli.ts receive",
+    "balance": "ts-node --project ./tsconfig.json src/cli.ts balance"
   },
   "dependencies": {
     "@coinbase/cdp-sdk": "^1.36.0",

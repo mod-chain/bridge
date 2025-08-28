@@ -1,9 +1,14 @@
 {
   "packageManager": "pnpm@9.6.0",
   "scripts": {
+    "wallet:help": "pnpm -C packages/wallet run help",
+    "wallet:check-env": "pnpm -C packages/wallet run check-env",
     "wallet:create": "pnpm -C packages/wallet run create",
     "wallet:get": "pnpm -C packages/wallet run get",
-    "wallet:faucet": "pnpm -C packages/wallet run faucet"
+    "wallet:faucet": "pnpm -C packages/wallet run faucet",
+    "wallet:send": "pnpm -C packages/wallet run send",
+    "wallet:receive": "pnpm -C packages/wallet run receive",
+    "wallet:balance": "pnpm -C packages/wallet run balance"
   },
   "dependencies": {
     "@coinbase/cdp-sdk": "^1.36.0",

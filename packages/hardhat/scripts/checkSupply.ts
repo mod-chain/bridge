@@ -2,6 +2,9 @@ import { ethers } from "ethers";
 import fs from "fs";
 import path from "path";
 import minimist from "minimist";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 const ROOT = path.resolve(__dirname, "../../..");
 const ADDR_PATH = path.join(ROOT, "ops/addresses.json");
