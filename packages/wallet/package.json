@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "typecheck": "tsc -p ./tsconfig.json --noEmit",
     "help": "ts-node --project ./tsconfig.json src/cli.ts help",
     "check-env": "ts-node --project ./tsconfig.json src/cli.ts check-env",
     "create": "ts-node --project ./tsconfig.json src/cli.ts create",
@@ -17,8 +18,8 @@
     "dotenv": "^17.2.1",
     "minimist": "^1.2.8",
     "ts-node": "^10.9.2",
-    "viem": "^2.35.1",
-    "types": "link:@coinbase/cdk-sdk/types"
+    "typecheck": "^0.1.2",
+    "viem": "^2.35.1"
   },
   "devDependencies": {
     "@types/minimist": "^1.2.5",

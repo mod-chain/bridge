@@ -1,6 +1,10 @@
 {
   "packageManager": "pnpm@9.6.0",
   "scripts": {
+    "typecheck": "pnpm run typecheck:wallet && pnpm run typecheck:hardhat && pnpm run typecheck:snowbridge",
+    "typecheck:wallet": "pnpm -C packages/wallet run typecheck",
+    "typecheck:hardhat": "pnpm -C packages/hardhat run typecheck",
+    "typecheck:snowbridge": "pnpm -C packages/snowbridge run typecheck",
     "wallet:help": "pnpm -C packages/wallet run help",
     "wallet:check-env": "pnpm -C packages/wallet run check-env",
     "wallet:create": "pnpm -C packages/wallet run create",
@@ -13,8 +17,7 @@
   "dependencies": {
     "@coinbase/cdp-sdk": "^1.36.0",
     "dotenv": "^17.2.1",
-    "ts-node": "^10.9.2",
-    "types": "link:@coinbase/cdk-sdk/types"
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "typescript": "^5.5.4"

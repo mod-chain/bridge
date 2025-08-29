@@ -12,8 +12,13 @@ type BaseNetworks = "base-sepolia" | "base";
 type Networks = BaseNetworks | EthNetworks;
 
 function prettyPrintBalances(balances: TokenBalances) {
-    const prettyMessage = balances.balances.map((balance) => `${balance.token.network}\n${balance.token.symbol}: ${prettyPrintBalance(Number(balance.amount.amount))}`).join("\n");
-    console.log(prettyMessage);
+  const prettyMessage = balances.balances
+    .map((balance) => {
+      const amt = BigInt(balance.amount.amount as unknown as string);
+      return `${balance.token.network}\n${balance.token.symbol}: ${prettyPrintBalance(amt)}`;
+    })
+    .join("\n");
+  console.log(prettyMessage);
 }
 
 async function getBaseBalances(account: EvmServerAccount, network: BaseNetworks) {

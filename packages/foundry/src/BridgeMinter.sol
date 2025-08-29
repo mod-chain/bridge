@@ -60,6 +60,7 @@ contract BridgeMinter is AccessControl, ReentrancyGuard {
     }
 
     function setAdmin(address newAdmin) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(newAdmin != address(0), "zero admin");
         _grantRole(DEFAULT_ADMIN_ROLE, newAdmin);
         _revokeRole(DEFAULT_ADMIN_ROLE, _msgSender());
     }

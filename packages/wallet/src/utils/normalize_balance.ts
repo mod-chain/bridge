@@ -1,18 +1,20 @@
+import { formatUnits, parseUnits } from "viem";
 
-function normalizeBalance(balance: number, decimals = 18) {
-    return balance / 10 ** decimals;
+// bigint-safe helpers using viem
+function normalizeBalance(balance: bigint, decimals = 18): string {
+  return formatUnits(balance, decimals);
 }
 
-function unnormalizeBalance(balance: string, decimals = 18) {
-    const numBalance = Number(balance);
-    return numBalance * 10 ** decimals;
+function unnormalizeBalance(balance: string, decimals = 18): bigint {
+  return parseUnits(balance, decimals);
 }
 
-function prettyPrintBalance(balance: number, decimals = 18) {
-    const normalized = normalizeBalance(balance, decimals);
-    return normalized.toFixed(6);
+function prettyPrintBalance(balance: bigint, decimals = 18): string {
+  const s = formatUnits(balance, decimals);
+  const [i, f = ""] = s.split(".");
+  if (f.length === 0) return `${i}.000000`;
+  const cut = f.length > 6 ? f.slice(0, 6) : f.padEnd(6, "0");
+  return `${i}.${cut}`;
 }
 
 export { normalizeBalance, unnormalizeBalance, prettyPrintBalance };
-
-    
