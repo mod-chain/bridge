@@ -11,9 +11,7 @@ const accessControlAbi = [
   "function getRoleAdmin(bytes32) view returns (bytes32)",
   "function DEFAULT_ADMIN_ROLE() view returns (bytes32)",
 ];
-const bridgeMinterAbi = accessControlAbi.concat([
-  "function RELAYER_ROLE() view returns (bytes32)",
-]);
+const bridgeMinterAbi = accessControlAbi.concat(["function RELAYER_ROLE() view returns (bytes32)"]);
 const erc20AccessControlAbi = [
   "function hasRole(bytes32,address) view returns (bool)",
   "function MINTER_ROLE() view returns (bytes32)",
@@ -47,8 +45,10 @@ async function main() {
   const l1Key = network === "mainnet" ? "ethereum" : "sepolia";
 
   const l1Rpc =
-    argv["l1-rpc"] || (network === "mainnet" ? process.env.ETHEREUM_RPC : process.env.ETHEREUM_SEPOLIA_RPC);
-  if (!l1Rpc) throw new Error("Missing L1 RPC. Use --l1-rpc or set ETHEREUM_RPC / ETHEREUM_SEPOLIA_RPC");
+    argv["l1-rpc"] ||
+    (network === "mainnet" ? process.env.ETHEREUM_RPC : process.env.ETHEREUM_SEPOLIA_RPC);
+  if (!l1Rpc)
+    throw new Error("Missing L1 RPC. Use --l1-rpc or set ETHEREUM_RPC / ETHEREUM_SEPOLIA_RPC");
   const provider = new ethers.JsonRpcProvider(l1Rpc);
 
   const minterAddr = addr(argv.minter) || addr(cfg[l1Key]?.BridgeMinter);
@@ -56,8 +56,10 @@ async function main() {
   const adminAddr = addr(argv.admin) || "";
   const l1TokenAddr = addr(argv["l1-token"]) || addr(cfg[l1Key]?.L1Token);
 
-  if (!minterAddr) throw new Error("BridgeMinter address not provided (use --minter or fill ops/addresses.json)");
-  if (!l1TokenAddr) throw new Error("L1 token address not provided (use --l1-token or fill ops/addresses.json)");
+  if (!minterAddr)
+    throw new Error("BridgeMinter address not provided (use --minter or fill ops/addresses.json)");
+  if (!l1TokenAddr)
+    throw new Error("L1 token address not provided (use --l1-token or fill ops/addresses.json)");
 
   const minter = new ethers.Contract(minterAddr, bridgeMinterAbi, provider);
   const token = new ethers.Contract(l1TokenAddr, erc20AccessControlAbi, provider);
@@ -107,4 +109,3 @@ main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
-

@@ -23,7 +23,11 @@ function normalizePk(pk?: string): string {
   if (!pk) throw new Error("Private key is required (--pk or DEPLOYER_PK/PRIVATE_KEY)");
   const trimmed = pk.trim().replace(/^"|"$/g, "").replace(/^'|'$/g, "");
   // Accept 0x-prefixed hex or 64-char hex without 0x
-  const hex = trimmed.startsWith("0x") ? trimmed : /^([0-9a-fA-F]{64})$/.test(trimmed) ? `0x${trimmed}` : trimmed;
+  const hex = trimmed.startsWith("0x")
+    ? trimmed
+    : /^([0-9a-fA-F]{64})$/.test(trimmed)
+      ? `0x${trimmed}`
+      : trimmed;
   if (!/^0x[0-9a-fA-F]{64}$/.test(hex)) {
     throw new Error("Invalid private key format. Provide 32-byte hex, with or without 0x prefix.");
   }
@@ -68,8 +72,10 @@ async function main() {
   if (!params.rpc) throw new Error("Missing RPC. Provide --rpc or set BASE_SEPOLIA_RPC/BASE_RPC.");
   if (!params.factory) throw new Error("Missing OptimismMintableERC20Factory address (--factory)");
   if (!params.l1Token) throw new Error("Missing L1 token address (--l1Token)");
-  if (!ethers.isAddress(params.factory)) throw new Error(`Factory is not a valid address: ${params.factory}`);
-  if (!ethers.isAddress(params.l1Token)) throw new Error(`L1 token is not a valid address: ${params.l1Token}`);
+  if (!ethers.isAddress(params.factory))
+    throw new Error(`Factory is not a valid address: ${params.factory}`);
+  if (!ethers.isAddress(params.l1Token))
+    throw new Error(`L1 token is not a valid address: ${params.l1Token}`);
 
   const provider = new ethers.JsonRpcProvider(params.rpc);
   const wallet = new ethers.Wallet(normalizePk(params.pk), provider);
