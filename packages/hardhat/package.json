@@ -7,6 +7,7 @@
     "verify:addresses": "ts-node scripts/verifyAddresses.ts",
     "withdraw": "ts-node scripts/withdraw.ts",
     "check:supply": "ts-node scripts/checkSupply.ts",
+    "roles:check": "ts-node scripts/checkRoles.ts",
     "typecheck": "tsc -p ./tsconfig.json --noEmit",
     "format": "prettier -w .",
     "format:check": "prettier -c ."
