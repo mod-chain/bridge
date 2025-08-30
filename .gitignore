@@ -49,3 +49,6 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Foundry broadcast artifacts
+packages/foundry/broadcast/

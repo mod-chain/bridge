@@ -80,13 +80,23 @@ cd ../snowbridge && pnpm i
 
 ### Foundry Scripts
 
-Deploy L2 token:
+**Install Foundry**
+
+```bash
+curl -L https://foundry.paradigm.xyz | bash
+# restart your shell or:
+source ~/.bashrc  # or ~/.profile / ~/.zshrc, depending on your shell
+foundryup
+forge --version
+```
+
+**Deploy L2 token**
 ```bash
 cd packages/foundry
 forge script script/DeployL2Token.s.sol --rpc-url $BASE_RPC --broadcast
 ```
 
-Deposit from L1 to Base:
+**Deposit from L1 to Base**
 ```bash
 AMOUNT=1000000000000000000 L2_GAS=200000 forge script script/DepositL1toBase.s.sol \
   --rpc-url $ETHEREUM_RPC --broadcast
@@ -94,18 +104,18 @@ AMOUNT=1000000000000000000 L2_GAS=200000 forge script script/DepositL1toBase.s.s
 
 ### Hardhat Scripts
 
-Deploy L2 token:
+**Deploy L2 token**
 ```bash
 cd packages/hardhat
 pnpm run deploy:l2
 ```
 
-Deposit tokens:
+**Deposit tokens**
 ```bash
 AMOUNT=1000000000000000000 L2_GAS=200000 pnpm run deposit
 ```
 
-Withdraw from Base to L1 (initiate only):
+**Withdraw from Base to L1 (initiate only):**
 ```bash
 cd packages/hardhat
 pnpm run withdraw -- --network sepolia \

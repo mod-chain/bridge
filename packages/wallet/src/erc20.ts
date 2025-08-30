@@ -11,10 +11,10 @@ const erc20Abi = [
 
 function clientFor(network: EthNetworks) {
   if (network === "ethereum") {
-    const url = process.env.ETHEREUM_RPC_URL;
+    const url = process.env.ETHEREUM_RPC_URL || process.env.ETHEREUM_RPC;
     return createPublicClient({ chain: mainnet, transport: http(url) });
   }
-  const url = process.env.ETHEREUM_SEPOLIA_RPC_URL;
+  const url = process.env.ETHEREUM_SEPOLIA_RPC_URL || process.env.ETHEREUM_SEPOLIA_RPC;
   return createPublicClient({ chain: sepolia, transport: http(url) });
 }
 

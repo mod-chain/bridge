@@ -5,7 +5,9 @@ libs = ["lib"]
 ffi = true
 optimizer = true
 optimizer_runs = 200
-
+fs_permissions = [
+  { access = "read", path = "../../ops" }
+]
 [etherscan]
 # optional, for verify
 base = { key = "${BASESCAN_API_KEY}" }

@@ -1,19 +1,21 @@
-# Substrate ↔ Ethereum L1 ↔ Base bridge starter
+# Substrate → Base: Node Relayer + BridgeMinter
 
-Opinionated, minimal scaffolding to move an ERC‑20 from Substrate to Base using only audited components:
+Minimal scaffolding to bridge a Substrate-originated value to Base using audited components:
 
-* **Snowbridge** for Substrate ↔ Ethereum L1
-* **OP Standard Bridge** for Ethereum L1 ↔ Base
+- L1 ERC‑20 with minting gated to a contract
+- BridgeMinter on Sepolia that mints then deposits via OP Standard Bridge
+- Node‑integrated relayer that consumes Substrate events and calls BridgeMinter
 
-This repo gives you ready‑to‑run scripts, tiny ABIs, and a clean way to lock in canonical addresses per network.
+This repo provides scripts, small ABIs, and a single source of truth for addresses per network.
 
 ---
 
 ## Directory
 
 ```
-substrate-to-base-bridge-starter/
-├─ substrate-to-base-bridge-starter.md  ← this file
+bridge/
+├─ docs/
+│  └─ substrate-to-base-bridge-starter.md  ← this file
 ├─ .env.sample
 ├─ ops/
 │  └─ addresses.json
@@ -21,24 +23,21 @@ substrate-to-base-bridge-starter/
 │  ├─ foundry/
 │  │  ├─ foundry.toml
 │  │  ├─ script/
+│  │  │  ├─ DeployBridgeMinter.s.sol
+│  │  │  ├─ ConfigureMinter.s.sol
 │  │  │  ├─ DeployL2Token.s.sol
 │  │  │  └─ DepositL1toBase.s.sol
 │  │  └─ src/
+│  │     ├─ BridgeMinter.sol
 │  │     └─ Interfaces.sol
-│  ├─ hardhat/
-│  │  ├─ package.json
-│  │  ├─ hardhat.config.ts
-│  │  └─ scripts/
-│  │     ├─ deployL2Token.ts
-│  │     └─ deposit.ts
-│  └─ snowbridge/
+│  └─ hardhat/
 │     ├─ package.json
-│     ├─ tsconfig.json
-│     ├─ scripts/
-│     │  ├─ registerToken.ts
-│     │  └─ sendToken.ts
-│     └─ abis/
-│        └─ Gateway.json
+│     ├─ hardhat.config.ts
+│     └─ scripts/
+│        ├─ deployL2Token.ts
+│        ├─ deposit.ts
+│        ├─ verifyAddresses.ts
+│        └─ checkSupply.ts
 └─ LICENSE
 ```
 
@@ -57,12 +56,9 @@ substrate-to-base-bridge-starter/
 
 ```
 cd packages/hardhat && pnpm i
-cd ../snowbridge && pnpm i
 ```
 
-4. Create the L2 token on Base using the canonical factory (via Foundry or Hardhat script), then deposit from L1 with the Standard Bridge.
-
-5. Verify your configured addresses exist on-chain before running transfers.
+4. Create the L2 token on Base using the canonical factory (via Foundry or Hardhat script), then verify addresses.
 
 ```
 cd packages/hardhat
@@ -70,13 +66,15 @@ pnpm i
 ETHEREUM_RPC=... ETHEREUM_SEPOLIA_RPC=... BASE_RPC=... BASE_SEPOLIA_RPC=... pnpm run verify:addresses
 ```
 
-6. If the asset is Substrate‑native, first register an L1 representation with Snowbridge and move it L1↔AssetHub using the Snowbridge scripts.
+5. Deploy BridgeMinter on Sepolia, grant it MINTER_ROLE on your L1 token, and whitelist your relayer EOA.
+
+6. Start the node‑integrated relayer (see Relayer section below), then call the Substrate extrinsic to lock funds and trigger bridging.
 
 ---
 
 ## Configuration
 
-**`ops/addresses.json`** holds canonical contract addresses per network. Fill in your L1 token and the L2 token address once created.
+**`ops/addresses.json`** holds canonical contract addresses per network. Fill in your L1 token, L2 token, and BridgeMinter once deployed.
 
 ```json
 {
@@ -85,14 +83,16 @@ ETHEREUM_RPC=... ETHEREUM_SEPOLIA_RPC=... BASE_RPC=... BASE_SEPOLIA_RPC=... pnpm
     "L1StandardBridge": "0x3154Cf16ccdb4C6d922629664174b904d80F2C35",
     "L1CrossDomainMessenger": "0x866E82a600A1414e583f7F13623F1aC5d58b0Afa",
     "OptimismMintableERC20Factory": "0x05cc379EBD9B30BbA19C6fA282AB29218EC61D84",
-    "L1Token": "0xYOUR_L1_TOKEN"
+    "L1Token": "0xYOUR_L1_TOKEN",
+    "BridgeMinter": "0xTO_BE_FILLED_AFTER_DEPLOY"
   },
   "sepolia": {
     "rpc": "${ETHEREUM_SEPOLIA_RPC}",
     "L1StandardBridge": "0xfd0Bf71F60660E2f608ed56e1659C450eB113120",
     "L1CrossDomainMessenger": "0xC34855F4De64F1840e5686e64278da901e261f20",
     "OptimismMintableERC20Factory": "0xb1efB9650aD6d0CC1ed3Ac4a0B7f1D5732696D37",
-    "L1Token": "0xYOUR_L1_TOKEN_ON_SEPOLIA"
+    "L1Token": "0xYOUR_L1_TOKEN_ON_SEPOLIA",
+    "BridgeMinter": "0xTO_BE_FILLED_AFTER_DEPLOY"
   },
   "base": {
     "rpc": "${BASE_RPC}",
@@ -107,10 +107,6 @@ ETHEREUM_RPC=... ETHEREUM_SEPOLIA_RPC=... BASE_RPC=... BASE_SEPOLIA_RPC=... pnpm
     "L2CrossDomainMessenger": "0x4200000000000000000000000000000000000007",
     "OptimismMintableERC20Factory": "0x4200000000000000000000000000000000000012",
     "L2Token": "0xTO_BE_FILLED_AFTER_DEPLOY"
-  },
-  "snowbridge": {
-    "sepolia_gateway": "0x5b4909ce6ca82d2ce23bd46738953c7959e710cd",
-    "mainnet_gateway": "0x27ca963c279c93801941e1eb8799c23f407d68e7"
   }
 }
 ```
@@ -362,104 +358,79 @@ main().catch(console.error);
 
 ---
 
-## Snowbridge scripts
+## BridgeMinter deployment and configuration
 
-**`packages/snowbridge/package.json`**
+Use the provided Foundry scripts.
 
-```json
-{
-  "name": "snowbridge-scripts",
-  "version": "0.1.0",
-  "type": "module",
-  "dependencies": {
-    "ethers": "^6.13.2",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.5.4"
-  },
-  "scripts": {
-    "register": "ts-node scripts/registerToken.ts",
-    "send": "ts-node scripts/sendToken.ts"
-  }
-}
+Deploy BridgeMinter on Sepolia:
+
+```
+cd packages/foundry
+# Required env: L1_TOKEN, L1_STANDARD_BRIDGE, L2_TOKEN, L1_ADMIN, DEPLOYER_PK_DEC
+forge script script/DeployBridgeMinter.s.sol \
+  --rpc-url $ETHEREUM_SEPOLIA_RPC --broadcast
 ```
 
-**`packages/snowbridge/scripts/registerToken.ts`**
+Grant MINTER_ROLE to BridgeMinter and whitelist your relayer EOA:
 
-```ts
-import { ethers } from "ethers";
-import fs from "fs";
-const cfg = JSON.parse(fs.readFileSync("../../ops/addresses.json", "utf8"));
-const RPC = process.env.ETHEREUM_RPC || process.env.ETHEREUM_SEPOLIA_RPC!;
-const PK = process.env.OPERATOR_PK!;
-const GATEWAY = process.env.SNOWBRIDGE_GATEWAY || cfg.snowbridge.sepolia_gateway;
-const TOKEN = process.env.L1_TOKEN || cfg.sepolia.L1Token;
-
-const abi = [
-  "function quoteRegisterTokenFee(address token) view returns (uint256)",
-  "function registerToken(address token) payable"
-];
-
-async function main() {
-  const provider = new ethers.JsonRpcProvider(RPC);
-  const wallet = new ethers.Wallet(PK, provider);
-  const gw = new ethers.Contract(GATEWAY, abi, wallet);
-
-  const fee: bigint = await gw.quoteRegisterTokenFee(TOKEN);
-  console.log("register fee:", fee.toString());
-  const tx = await gw.registerToken(TOKEN, { value: fee });
-  console.log("register tx:", tx.hash);
-}
-
-main().catch(console.error);
+```
+cd packages/foundry
+# Required env: L1_TOKEN, BRIDGE_MINTER, L1_ADMIN, DEPLOYER_PK_DEC
+# Optional: RELAYER_EOA (EOA that will call mintAndBridge)
+forge script script/ConfigureMinter.s.sol \
+  --rpc-url $ETHEREUM_SEPOLIA_RPC --broadcast
 ```
 
-**`packages/snowbridge/scripts/sendToken.ts`**
+Note: The L1 token must be `AccessControl`-based and expose `MINTER_ROLE` (see `packages/foundry/src/ModNL1Token.sol`).
 
-```ts
-import { ethers } from "ethers";
-import fs from "fs";
-const cfg = JSON.parse(fs.readFileSync("../../ops/addresses.json", "utf8"));
-const RPC = process.env.ETHEREUM_RPC || process.env.ETHEREUM_SEPOLIA_RPC!;
-const PK = process.env.OPERATOR_PK!;
-const GATEWAY = process.env.SNOWBRIDGE_GATEWAY || cfg.snowbridge.sepolia_gateway;
-const TOKEN = process.env.L1_TOKEN || cfg.sepolia.L1Token;
+## Relayer (node‑integrated)
 
-// destinationChain is the parachain id. Example: 1000 for Asset Hub on some testnets. Parameterize it.
-const DEST_CHAIN = Number(process.env.DEST_CHAIN || 1000);
-// Destination address kind and bytes are chain‑specific. For Asset Hub, this is a 32‑byte AccountId, encoded as hex.
-const DEST_KIND = Number(process.env.DEST_KIND || 0); // 0 = AccountId32, per Snowbridge docs
-const DEST_BYTES = process.env.DEST_BYTES!; // 0x...
-const DEST_FEE = BigInt(process.env.DEST_FEE || "0"); // often 0 for Asset Hub
-const AMOUNT = BigInt(process.env.AMOUNT || "0");
+Run the node with the bridge task enabled and these flags (or matching env vars):
 
-const abi = [
-  "function quoteSendTokenFee(address token, uint32 destinationChain, (uint8 kind, bytes data) destinationAddress, uint128 destinationFee, uint128 amount) view returns (uint256)",
-  "function sendToken(address token, uint32 destinationChain, (uint8 kind, bytes data) destinationAddress, uint128 destinationFee, uint128 amount) payable"
-];
-
-async function main() {
-  const provider = new ethers.JsonRpcProvider(RPC);
-  const wallet = new ethers.Wallet(PK, provider);
-  const gw = new ethers.Contract(GATEWAY, abi, wallet);
-
-  const dest = { kind: DEST_KIND, data: DEST_BYTES };
-  const fee: bigint = await gw.quoteSendTokenFee(TOKEN, DEST_CHAIN, dest, DEST_FEE, AMOUNT);
-  console.log("send fee:", fee.toString());
-  const tx = await gw.sendToken(TOKEN, DEST_CHAIN, dest, DEST_FEE, AMOUNT, { value: fee });
-  console.log("send tx:", tx.hash);
-}
-
-main().catch(console.error);
+```
+--bridge.enable
+--bridge.l1-rpc <https Sepolia RPC>
+--bridge.base-rpc <https Base Sepolia RPC>
+--bridge.pk 0x<hex EOA private key for this node>
+--bridge.l1-token 0x<L1 ERC20>
+--bridge.l2-token 0x<L2 OptimismMintable ERC20>
+--bridge.l1-bridge 0xfd0Bf71F60660E2f608ed56e1659C450eB113120
+--bridge.l2-gas 200000
+--bridge.substrate-decimals 12
+--bridge.erc20-decimals 18
+--bridge.minter 0x<BridgeMinter on Sepolia>
+--bridge.poll-interval-ms 1500
 ```
 
-**`packages/snowbridge/abis/Gateway.json`** is intentionally thin. The two functions above are all you need.
+EventId derivation (used for replay‑protection on L1):
+
+```
+eventId = keccak256(abi.encode(
+  "SUBSPACE",
+  genesis_hash,   // 32 bytes
+  nonce,          // u64
+  who,            // SCALE-encoded AccountId bytes
+  amount_native,  // SCALE-encoded
+  l2_recipient    // 20 bytes
+))
+```
+
+Unit conversion:
+- If `SUB_DEC < ERC_DEC`: `amount_wei = amount_native * 10^(ERC_DEC - SUB_DEC)`
+- If `SUB_DEC > ERC_DEC`: `amount_wei = amount_native / 10^(SUB_DEC - ERC_DEC)`
+
+Relay steps per event:
+1) Ensure `BridgeMinter.consumed(eventId) == false`.
+2) Call `BridgeMinter.mintAndBridge(eventId, l2_recipient, amount_wei, l2_gas)`.
+
+Backoff, leader selection, and security posture are documented in `docs/project_spec.md`.
 
 ---
 
 ## Ops notes
 
 * Set `L2_GAS` conservatively for deposits, then tune.
-* Always track supply conservation across Substrate, L1 escrow, and Base L2 total supply.
+* Always track supply conservation across Substrate locked funds, L1 escrow, and Base L2 total supply.
 * Prefer a Safe for any admin keys.
 
 ---
